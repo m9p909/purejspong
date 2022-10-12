@@ -1,0 +1,11 @@
+{
+  "devDependencies": {
+    "typescript": "^4.8.4"
+  },
+  "scripts": {
+    "build": "esbuild ./src/*.ts --bundle --outdir=build"
+  },
+  "dependencies": {
+    "esbuild": "^0.15.10"
+  }
+}

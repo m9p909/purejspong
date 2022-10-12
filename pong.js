@@ -97,31 +97,63 @@ const getCornersOfBox = (x, y, w, h) => {
   ];
 };
 
+const getRange = (y, h) => {
+  return [y, y+h]
+}
+
 const getCornersOfPaddle = (x, y) => {
   return getCornersOfBox(x, y, paddleWidth, paddleHeight);
 };
 
-const collisionVertical = (state) => {
-  ballCorners = getCornersOfBox(state.ball.x, state.ball.y, ballSize, ballSize);
+const getBallCorners = (state) => {
+  return getCornersOfBox(state.ball.x, state.ball.y, ballSize, ballSize);
+}
 
-  paddleCorners = getCornersOfPaddle(leftPaddleX, state.leftPaddleY);
+const checkValueInRanges = (value, paddleRanges) => {
+  let res = false
+  paddleRanges.forEach((range) => {
+    if(value >= range[0] && value <= range[1]){
+      res = true
+    }
+  })
+  return res
+
+}
+
+const detectPaddleCollisions = (state) => {
+  const ballCorners = getBallCorners(state);
+
+  leftPaddleYRange = getRange(state.leftPaddleY, paddleHeight);
+  rightPaddleYRange = getRange(state.rightPaddleY, paddleHeight);
+  leftPaddleXRange = getRange(leftPaddleX, paddleWidth);
+  rightPaddleXRange = getRange(rightPaddleX, paddleWidth);
+  paddleYRanges = [leftPaddleYRange, rightPaddleYRange];
+  paddleXRanges = [leftPaddleXRange, rightPaddleXRange];
+
+  let res = false
+  for(const ballCorner of ballCorners){
+    let yCollision = checkValueInRanges(ballCorner[1], paddleYRanges);
+    let xCollision = checkValueInRanges(ballCorner[0], paddleXRanges);
+    if (xCollision && yCollision) {
+      console.log(state);
+      return true
+    }
+  }
+  return false;
 };
 
+
 const handlePaddleCollisions = (state) => {
-  
-  if (collisionHorizontal(state)) {
-    state.ball.velocityX = -state.ball.velocityX;
+  while (detectPaddleCollisions(state)) {
+    const [x,y] = state.ball.ballHistory.pop();
+    state.ball.velocityX = state.ball.velocityX * -1
+    state.ball.x = x
+    state.ball.y = y
+    console.log("ball location set to "+x+" "+y+"\n velocity is "+state.ball.velocityX)
+    if (!state.ball) {
+      throw new Error("ran out of history");
+    }
   }
-
-  if (collisionVertical(state)) {
-    state.ball.velocityY = -state.ball.velocityY;
-  }
-
-  if (collisionDiagonal(state)) {
-    state.ball.velocityX = -state.ball.velocityX
-    state.ball.velocityY = - state.ball.velocityY
-  }
-
   return state;
 };
 
@@ -129,15 +161,14 @@ const handleBallCollisions = (state) => {
   state = handleSideCollisions(state);
 
   state = handlePaddleCollisions(state);
+  return state
 };
 
 const applyVelocity = (ball) => {
   ball.x = ball.x + ball.velocityX;
 
   ball.y = ball.y + ball.velocityY;
-  ball.ballHistory.push(ball)
-
-
+  ball.ballHistory.push([ball.x, ball.y])
   return ball;
 };
 
@@ -146,15 +177,15 @@ class BallHistory {
 
   constructor(history){
     if(history){
-      for(const value in history){
+      history.forEach((value) => {
         this.previousLocations.push(value)
-      }
+      })
     }
   }
 
   push(v) {
     this.previousLocations.push(v);
-    if(this.previousLocations.length() > 5) {
+    if(this.previousLocations.length > 5) {
       this.previousLocations.shift()
     }
   }
@@ -279,7 +310,6 @@ const render = (state) => {
 };
 
 const updatePaddlesWithUserInput = (state) => {
-  console.log(currentControllerState);
 
   if (currentControllerState.player1.up) {
     state.leftPaddleY = state.leftPaddleY - paddleSpeed;
