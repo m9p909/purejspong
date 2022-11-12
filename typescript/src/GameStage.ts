@@ -22,9 +22,8 @@ export default class GameStage {
       38, 40, { x: undefined, y: half }, clock)
 
     this.scoreboard = new ScoreBoard(renderer)
-    this.ball = new Ball(renderer,
-      this.clock, this.scoreboard)
-    this.collisionDetector = new BallPaddleCollisionDetector(this.ball, this.leftPaddle, this.rightPaddle)
+    this.collisionDetector = new BallPaddleCollisionDetector(this.leftPaddle, this.rightPaddle)
+    this.ball = new Ball(renderer, this.clock, this.scoreboard, this.collisionDetector)
   }
 
   getTimeElapsed() {
@@ -38,7 +37,6 @@ export default class GameStage {
     this.ball.update()
     this.rightPaddle.update()
     this.leftPaddle.update()
-    this.collisionDetector.solve()
   }
 
   render() {

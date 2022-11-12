@@ -1,6 +1,7 @@
 export default class Point {
   constructor(public x: number, public y: number) { }
 
+
   add(other: Point) {
     return new Point(other.x + this.x, other.y + this.y)
   }
@@ -20,5 +21,9 @@ export default class Point {
 
   getY(): number {
     return this.getDefined(this.y)
+  }
+
+  clone() {
+    return new Point(this.x, this.y)
   }
 }
