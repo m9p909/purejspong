@@ -2,37 +2,43 @@ import Renderer from "./Renderer"
 import ScoreBoard from "./ScoreBoard"
 import Point from "./Point"
 import Vector from "./Vector"
+import Rectangle from './Rectangle'
 
 
-export default class Ball {
+export default class Ball implements Rectangle {
   ballSize=30
-  initialVelocity = new Vector(-60, 40) // px/s
+  public width;
+  public height;
+  initialVelocity = new Vector(-300, 100) // px/s
   initialPostition = new Point(500,250)
   velocity =  new Vector(this.initialVelocity.x, this.initialVelocity.y)
-  position = new Point(this.initialPostition.x, this.initialPostition.y)
+  pos = new Point(this.initialPostition.x, this.initialPostition.y)
 
   constructor(private renderer: Renderer,
               private clock: number ,
               private scoreboard: ScoreBoard){
+                this.width = this.ballSize;
+                this.height = this.ballSize;
   }
 
-  drawBall = (point: Point) => {
-    this.renderer.drawRectangle(point.x, point.y, this.ballSize, this.ballSize);
+  drawBall = () => {
+    this.renderer.drawRectangle(this);
   };
 
   applyVelocity(){
     const seconds = this.clock/1000
     const changePos = this.velocity.times(seconds)
-    this.position = this.position.add(changePos)
+    this.pos = this.pos.add(changePos)
   }
 
   checkSideCollisions(){
     const renderer = this.renderer
-    const leftScored = this.position.x >= renderer.getCanvasWidth()-this.ballSize
-    const rightScored =this.position.x <= 0
+    const leftScored = this.pos.x >= renderer.getCanvasWidth()-this.ballSize
+    const rightScored =this.pos.x <= 0
     if( leftScored || rightScored ){
-      this.position = this.initialPostition
-      this.velocity.x = - this.velocity.y
+      this.pos = this.initialPostition
+      this.velocity.y = -this.velocity.y
+      this.reverseHorizontal()
       if(leftScored){
         this.scoreboard.leftScored()
       } else {
@@ -40,20 +46,27 @@ export default class Ball {
       }
     }
 
-    if(this.position.y >= renderer.getCanvasHeight()-this.ballSize || 
-      this.position.y <= 0){
+    if(this.pos.y >= renderer.getCanvasHeight()-this.ballSize || 
+      this.pos.y <= 0){
       this.velocity.y = - this.velocity.y
     }
+  }
+
+  reverseHorizontal(){
+    this.velocity.x = -this.velocity.x;
   }
 
 
   update() {
     this.applyVelocity()
     this.checkSideCollisions()
-    this.drawBall(this.position)
+  }
+
+  render(){
+    this.drawBall()
   }
 
   getPosition() {
-    return this.position
+    return this.pos
   }
 }

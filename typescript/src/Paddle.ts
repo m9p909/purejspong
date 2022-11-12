@@ -1,19 +1,25 @@
 import Point from "./Point"
 import Renderer from "./Renderer"
+import Rectangle from './Rectangle'
 
-export default class Paddle {
-  paddleWidth=50
-  paddleHeight=100
-  paddleSpeed=50 // px per s
-  downKeyPressed=false
-  upKeyPressed=false
+
+export default class Paddle implements Rectangle {
+  height = 50
+  width = 100
+  paddleSpeed = 50 // px per s
+  downKeyPressed = false
+  upKeyPressed = false
+  pos: Point;
 
   constructor(private renderer: Renderer,
-              private keyup: number,
-              private keydown: number,
-              private position: Point,
-              private clock: number){
-    this.position.x = this.position.x ? this.position.x : this.renderer.getCanvasWidth()-this.paddleWidth-10;
+    private keyup: number,
+    private keydown: number,
+    position: { x: number | undefined, y: number },
+    private clock: number) {
+
+    const x = position.x ? position.x : this.renderer.getCanvasWidth() - this.width - 10;
+    this.pos = new Point(x, position.y)
+
     document.addEventListener("keydown", (event) => {
       this.keydownEventHandler(event, true)
     })
@@ -22,22 +28,25 @@ export default class Paddle {
     })
   }
 
-  drawPaddle = (point: Point) => {
-    this.renderer.drawRectangle(point.x, point.y, this.paddleWidth, this.paddleHeight);
+  drawPaddle = () => {
+    this.renderer.drawRectangle(this);
   };
 
-  updatePosition(){
-    const change = this.paddleSpeed/this.clock
-    const downKeyPressed = this.downKeyPressed ? 1 :0
-    const upKeyPressed = this.upKeyPressed ? 1 :0
-    let changeY = downKeyPressed * change + 
+  updatePosition() {
+    const change = this.paddleSpeed / this.clock
+    const downKeyPressed = this.downKeyPressed ? 1 : 0
+    const upKeyPressed = this.upKeyPressed ? 1 : 0
+    let changeY = downKeyPressed * change +
       upKeyPressed * -change;
-    this.position = this.position.add(new Point(0,changeY))
+    this.pos = this.pos.add(new Point(0, changeY))
   }
 
-  update(){
+  update() {
     this.updatePosition()
-    this.drawPaddle(this.position)
+  }
+
+  render() {
+    this.drawPaddle()
   }
 
   keydownEventHandler(event: KeyboardEvent, down: boolean) {
@@ -52,15 +61,15 @@ export default class Paddle {
         this.upKeyPressed = down
         break;
     }
-    
+
   }
 
-  getPosition(){
-    return this.position
+  getPosition() {
+    return this.pos
   }
 
-  getHeightWidth(){
-    return [this.paddleHeight, this.paddleWidth]
+  getHeightWidth() {
+    return [this.height, this.width]
   }
-  
+
 }
