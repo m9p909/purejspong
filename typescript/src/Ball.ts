@@ -102,11 +102,7 @@ export default class Ball implements Rectangle {
   updateX() {
     const prevPos = this.pos.clone();
     this.applyVelocityX()
-    let changeVel = false;
-
-    this.ballPaddleCollisionDetector.checkAllCollisions(this, () => {
-      changeVel = true;
-    })
+    const changeVel = this.ballPaddleCollisionDetector.checkAllCollisions()
 
     if (changeVel) {
       this.reverseHorizontalVel()
@@ -119,10 +115,8 @@ export default class Ball implements Rectangle {
   updateY() {
     const prevPos = this.pos.clone();
     this.applyVelocityY()
-    let reverseY = false;
-    this.ballPaddleCollisionDetector.checkAllCollisions(this, () => {
-      reverseY = true;
-    })
+    let reverseY = this.ballPaddleCollisionDetector.checkAllCollisions()
+
 
     if (this.checkSideCollisionsY()) {
       reverseY = true;

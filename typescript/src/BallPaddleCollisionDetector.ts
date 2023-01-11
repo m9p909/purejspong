@@ -5,14 +5,22 @@ import Rectangle from "./Rectangle"
 
 
 export default class BallPaddleCollisionDetector {
-
+  leftPaddle?: Paddle
+  rightPaddle?: Paddle
+  ball?: Ball
 
   historyCounter = 0
 
-  constructor(
-    private leftPaddle: Paddle,
-    private rightPaddle: Paddle) {
+  init(
+    leftPaddle: Paddle,
+    rightPaddle: Paddle,
+    ball: Ball) {
+    this.leftPaddle = leftPaddle
+    this.rightPaddle = rightPaddle
+    this.ball = ball
+
   }
+
 
 
   collisionBetweenTwoRectangles(a: Rectangle, b: Rectangle) {
@@ -35,12 +43,16 @@ export default class BallPaddleCollisionDetector {
   checkPaddleCollision(paddle: Paddle, ball: Ball, onCollision: () => void) {
     if (this.collisionBetweenTwoRectangles(paddle, ball)) {
       onCollision();
+      return true;
     }
+
+    return false
   }
 
-  checkAllCollisions(ball: Ball, onCollision: () => void) {
-    this.checkPaddleCollision(this.leftPaddle, ball, onCollision)
-    this.checkPaddleCollision(this.rightPaddle, ball, onCollision)
+  checkAllCollisions(): boolean {
+    if (this.ball && this.leftPaddle && this.rightPaddle)
+      return this.collisionBetweenTwoRectangles(this.ball, this.leftPaddle) || this.collisionBetweenTwoRectangles(this.ball, this.rightPaddle)
+    return false
   }
 
 

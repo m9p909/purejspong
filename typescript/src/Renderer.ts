@@ -7,6 +7,7 @@ export default class Renderer {
     this.elem = elem
     const ctx = elem.getContext("2d")
     if (ctx) {
+      ctx.font = "48px arial"
       this.ctx = ctx
     } else {
       throw new Error("ctx must be a canvas element with 2d context")
@@ -32,6 +33,13 @@ export default class Renderer {
   getCanvasWidth() {
     return this.elem.width
   }
+
+  drawText(text: string, x: number, y: number) {
+    this.ctx.fillText(text, x, y)
+  }
+
+
+
 
 
 }

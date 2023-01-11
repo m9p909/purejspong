@@ -1,6 +1,7 @@
 import Point from "./Point"
 import Renderer from "./Renderer"
 import Rectangle from './Rectangle'
+import BallPaddleCollisionDetector from "./BallPaddleCollisionDetector"
 
 
 export default class Paddle implements Rectangle {
@@ -15,7 +16,8 @@ export default class Paddle implements Rectangle {
     private keyup: number,
     private keydown: number,
     position: { x: number | undefined, y: number },
-    private clock: number) {
+    private clock: number,
+    private collisionDetector: BallPaddleCollisionDetector) {
 
     const x = position.x ? position.x : this.renderer.getCanvasWidth() - this.width - 10;
     this.pos = new Point(x, position.y)
@@ -38,7 +40,11 @@ export default class Paddle implements Rectangle {
     const upKeyPressed = this.upKeyPressed ? 1 : 0
     let changeY = downKeyPressed * change +
       upKeyPressed * -change;
+    const initialPos = this.pos.clone()
     this.pos = this.pos.add(new Point(0, changeY))
+    if (this.collisionDetector.checkAllCollisions()) {
+      this.pos = initialPos
+    }
   }
 
   update() {
