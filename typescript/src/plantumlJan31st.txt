@@ -1,0 +1,37 @@
+@startuml
+class Ball
+class BallPaddleCollisionDetector
+class Game
+class GameStage
+class Paddle
+class Point
+class Rectangle
+class Renderer
+class ScoreBoard
+class Vector
+
+Game *-d- GameStage
+Game *- Renderer
+HTMLCanvasElement -> Renderer
+Renderer -> GameStage
+BallPaddleCollisionDetector -u-* GameStage
+Paddle -u-* GameStage: 2
+ScoreBoard -u-* GameStage
+Ball -u-* GameStage
+Paddle -d-> BallPaddleCollisionDetector: 2
+Ball -d-> BallPaddleCollisionDetector
+BallPaddleCollisionDetector -u-> Paddle
+BallPaddleCollisionDetector -u-> Ball
+Renderer -> Paddle
+Paddle -u-|> Rectangle
+Rectangle *- Point
+Renderer -d-> ScoreBoard
+ScoreBoard -d-> Ball
+Ball -|> Rectangle
+Renderer -> Ball
+Point -d-* Ball
+Vector -d-* Ball
+Point -* Paddle
+
+
+@enduml
