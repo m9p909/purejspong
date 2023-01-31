@@ -33,5 +33,6 @@ Point -d-* Ball
 Vector -d-* Ball
 Point -* Paddle
 
-
+document -> Paddle : addEventListener
+document -> Game : getElementById
 @enduml
